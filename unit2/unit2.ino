@@ -3,9 +3,6 @@
 #include <SoftwareSerial.h>
 
 
-const int inGamePin = 7;
-const int outGamePin = 6;
-
 const int but1 = 2;
 const int but2 = 3;
 const int but3 = 4;
@@ -18,14 +15,12 @@ int butPins[] = {but1, but2, but3};
 int ledPins[] = {led1, led2, led3};
 int randNum;
 
-int val = 0;
+int active = 0;
 const int rxPin = 7;
 const int txPin = 6;
 SoftwareSerial sSerial(rxPin, txPin);
 
 void setup() {
-  pinMode(inGamePin, INPUT);
-
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
   pinMode(led3, OUTPUT);
@@ -43,30 +38,35 @@ void setup() {
 
 void loop() {
   if (sSerial.available() > 0) {
-        val = sSerial.read();
+        active = sSerial.read();
+//        Serial.println(active);
   }
 
-  // start round
-  if (val) {
-    // light a random pin
+  if (active == 1) {
     randNum = random(3);
     digitalWrite(ledPins[randNum], HIGH);
 
-    
-    while(val) {
+    while(active) {
+//      Serial.println(digitalRead(butPins[randNum]));
       if (digitalRead(butPins[randNum])) {
           // SEND HIGH SIGNAL TO SCORE
+//          Serial.println("SCORE!!!!!");
           Serial.write(1);
           delay(200); // stay below 500ms
           Serial.write(0);
       }
       
       if (sSerial.available() > 0) {
-        val = sSerial.read();
+        int temp = sSerial.read();
+        if (temp == 1 || temp == 0) {
+          active = temp;
+//          Serial.println(active, DEC);
+        }
       }
     }
-      
+//    Serial.println("setting to low");
     digitalWrite(ledPins[randNum], LOW);
+    
   }
 }
  

@@ -9,9 +9,6 @@
 #include <TimeLib.h>
 #include <SoftwareSerial.h>
 
-const int inGamePin = 7;
-const int outGamePin = 6;
-
 const int but1 = 2;
 const int but2 = 3;
 const int but3 = 4;
@@ -29,9 +26,9 @@ const int rxPin = 7;
 const int txPin = 6;
 SoftwareSerial sSerial(rxPin, txPin);
 
+int active = 0;
+
 void setup() {
-  pinMode(inGamePin, INPUT);
-  
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
   pinMode(led3, OUTPUT);
@@ -48,22 +45,16 @@ void setup() {
   Serial.println("<Arduino is ready>");
 }
 
-int val = 0;
+
 
 void loop() {
-//  if (Serial.available() > 0) {
-//        incomingByte = Serial.read();
-//        Serial.println(incomingByte, DEC);
-//  }
-
   if (sSerial.available() > 0) {
-        val = sSerial.read();
-//        Serial.println(incomingByte, DEC);
+    active = sSerial.read();
+    Serial.println(active, DEC);
   }
 
 
-
-  while (val) {
+  while (active) {
     randNum = random(3);
     bool penalty = false;
 
@@ -89,11 +80,17 @@ void loop() {
     Serial.write(0); // digitalWrite(outGamePin, LOW);
     
     if (sSerial.available() > 0) {
-      val = sSerial.read();
+      active = sSerial.read();
     }
-    Serial.println(val, DEC);
+    
+    Serial.println(active, DEC);
   }
 }
+
+//  if (Serial.available() > 0) {
+//        incomingByte = Serial.read();
+//        Serial.println(incomingByte, DEC);
+//  }
 
 
 //Serial.print(analogRead(A0));
